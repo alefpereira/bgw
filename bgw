@@ -1,0 +1,154 @@
+#!/bin/bash
+set -e
+
+BGW_VERSION='0.1-beta'
+
+function bgw_version {
+  echo "bgw $BGW_VERSION"
+  exit 0
+}
+
+function usage {
+  cat << EOF
+Usage: bgw [--help] <command> <windowtitle>
+Setup a window in desktop background
+
+Commands:
+  lock            Lock a window to desktop background of its current screen. The
+                  locked window will be resized to fill the screen. It will be
+                  hidden from task/window list, but will be shown in all
+                  workspaces. You also won't be able to resized or move it.
+  unlock          Unlock a window from the desktop background. The unlocked
+                  window will be shown in task/window list, and you will be able
+                  to move it arround.
+  activate        Activate/show/focus a window. Match window title partially.
+
+Arguments:
+    windowtitle   Window title
+
+Options:
+  -h, --help      Show this help
+  -v, --version   Show version
+
+Examples:
+  * Focus window titled "MyWindowTitle":
+  bgw activate MyWindowTitle
+
+  * Lock "MyWindowTitle" to background:
+  bgw lock MyWindowTitle
+
+  * Show this help:
+  bgw --help
+EOF
+  exit 1
+}
+
+function not_bgw_command {
+  cat << EOF
+bgw: '$1' is not a bgw command. See 'bgw --help'.
+
+Commands supported:
+  activate
+  lock
+  unlock
+EOF
+  exit 1
+}
+
+function bgw_set_window_type_normal {
+  # Force window type to "normal" to allow changes in "maximize" properties
+  xprop -name $1 -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_NORMAL
+}
+
+function bgw_set_window_type_desktop {
+  # Set window type to "desktop" to remove it from the tasklist and display it
+  # in background
+  xprop -name $1 -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_DESKTOP
+}
+
+function bgw_add_sticky {
+  # Show window in all workspace
+  wmctrl -r $1 -b add,sticky
+}
+
+function bgw_remove_sticky {
+  # Remove from all workspace
+  wmctrl -r $1 -b remove,sticky
+}
+
+function bgw_maximize {
+  # Maximize
+  wmctrl -b add,maximized_vert,maximized_horz -r $1
+}
+
+function bgw_unmaximize {
+  # Unmaximize
+  wmctrl -b remove,maximized_vert,maximized_horz -r $1
+}
+
+function bgw_resize_to_fill_screen {
+  # Maximize to get window maximized GEOMETRY
+  bgw_maximize $1
+  # Give time to window to get maximized
+  sleep 0.1
+  # Get window maximized GEOMETRY
+  GEOMETRY_LINE=$(wmctrl -l -G | grep $1 | tr -s ' ')
+  X_POS=$(echo $GEOMETRY_LINE | cut -d ' ' -f 3)
+  Y_POS=$(echo $GEOMETRY_LINE | cut -d ' ' -f 4)
+  WIDTH=$(echo $GEOMETRY_LINE | cut -d ' ' -f 5)
+  HEIGHT=$(echo $GEOMETRY_LINE | cut -d ' ' -f 6)
+  # Remove maximization. Needed to be able to resize.
+  bgw_unmaximize $1
+  # Resize window to maximized geometry
+  wmctrl -e 0,$X_POS,$Y_POS,$WIDTH,$HEIGHT -r $1
+}
+
+function bgw_unlock {
+  bgw_set_window_type_normal $1
+  bgw_remove_sticky $1
+  bgw_resize_to_fill_screen $1
+  bgw_maximize $1
+}
+
+function bgw_lock {
+  bgw_unlock $1
+  bgw_add_sticky $1
+  bgw_set_window_type_desktop $1
+}
+
+function bgw_activate {
+  wmctrl -a $1
+}
+
+# Parse commands and options
+# getopt options
+SHORT_OPTS="hv"
+LONG_OPTS="help,version"
+
+# Parse params with getopt
+PARSED_PARAMS=$(getopt -n $0 -o $SHORT_OPTS -l $LONG_OPTS -- "$@")
+
+# Check last command (getopt params parsing) executed without error.
+VALID_PARAMS=$?
+if [ ! $VALID_PARAMS -eq 0 ]; then # 0 is ok, other than that is error
+  usage
+fi
+
+eval set -- "$PARSED_PARAMS"
+while :
+do
+  case "$1" in
+    -h | --help)     usage         ;;
+    -v | --version)  bgw_version   ;;
+    --) shift; break ;; # "--" is a special case indicating the ending of the options. The remaining parsed params are positional params.
+  esac
+done
+
+# Command
+case "$1" in
+  activate)  bgw_activate $2       ;;
+  lock)      bgw_lock $2           ;;
+  unlock)    bgw_unlock $2         ;;
+  '')        usage                 ;;
+  *)         not_bgw_command $1    ;;
+esac
