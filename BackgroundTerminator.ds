@@ -1,0 +1,9 @@
+(if (is (window_name) "BackgroundTerminator")
+    (begin
+        (undecorate)
+        (maximize)
+        (pin)
+        (wintype "desktop")
+        (center)
+    )
+)
