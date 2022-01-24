@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 BGW_VERSION='0.1-beta'
 
@@ -134,6 +133,7 @@ if [ ! $VALID_PARAMS -eq 0 ]; then # 0 is ok, other than that is error
   usage
 fi
 
+set -e
 eval set -- "$PARSED_PARAMS"
 while :
 do
