@@ -125,7 +125,7 @@ SHORT_OPTS="hv"
 LONG_OPTS="help,version"
 
 # Parse params with getopt
-PARSED_PARAMS=$(getopt -n $0 -o $SHORT_OPTS -l $LONG_OPTS -- "$@")
+PARSED_PARAMS=$(getopt -n $(basename $0) -o $SHORT_OPTS -l $LONG_OPTS -- "$@")
 
 # Check last command (getopt params parsing) executed without error.
 VALID_PARAMS=$?
