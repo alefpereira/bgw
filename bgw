@@ -163,9 +163,9 @@ done
 
 # Command
 case "$1" in
-  activate)  bgw_activate $2       ;;
-  lock)      bgw_lock $2           ;;
-  unlock)    bgw_unlock $2         ;;
-  '')        usage                 ;;
-  *)         not_bgw_command $1    ;;
+  activate)      bgw_activate      $2  ;;
+  lock)          bgw_lock          $2  ;;
+  unlock)        bgw_unlock        $2  ;;
+  '')            usage                 ;;
+  *)             not_bgw_command   $1  ;;
 esac
