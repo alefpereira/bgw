@@ -21,6 +21,7 @@ Commands:
                   window will be shown in task/window list, and you will be able
                   to move it arround.
   activate        Activate/show/focus a window. Match window title partially.
+  show-desktop    Minimize all windows
 
 Arguments:
     windowtitle   Window title
@@ -133,7 +134,11 @@ function bgw_lock {
 }
 
 function bgw_activate {
-  wmctrl -a $1 && wmctrl -k on
+  wmctrl -a $1
+}
+
+function bgw_show_desktop {
+  wmctrl -k on
 }
 
 # Parse commands and options
@@ -164,6 +169,7 @@ done
 # Command
 case "$1" in
   activate)      bgw_activate      $2  ;;
+  show-desktop)  bgw_show_desktop  $2  ;;
   lock)          bgw_lock          $2  ;;
   unlock)        bgw_unlock        $2  ;;
   '')            usage                 ;;
