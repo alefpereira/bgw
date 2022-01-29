@@ -20,13 +20,14 @@ Setup a terminal in desktop background.
 Commands:
   start           Start terminal and setup it in the desktop background. If
                   terminal is already running, run 'lock'.
-  lock            Lock terminal to desktop background of its current screen.
-                  This command can also be used to fix window size problem on
-                  already running background terminal.
+  lock            Lock terminal to desktop background of its current screen. If
+                  terminal is already running in background, this command will
+                  perform the window size maximization (useful to fix broken
+                  window size) and focus the terminal.
   unlock          Unlock terminal from the desktop background.
-  activate        Activate/show/focus background terminal.
 
 If no command is specified, bgterm will execute 'start' command.
+All commands will focus the terminal.
 
 Options:
   -h, --help      Show this help
@@ -41,7 +42,6 @@ bgterm: '$1' is not a bgterm command. See 'bgterm --help'.
 
 Commands supported:
   start
-  activate
   lock
   unlock
 EOF
@@ -54,10 +54,12 @@ function bgterm_run_activate {
 
 function bgterm_run_lock {
   bgw lock $BGTERM_TITLE
+  bgterm_run_activate && bgw show-desktop
 }
 
 function bgterm_run_unlock {
   bgw unlock $BGTERM_TITLE
+  bgterm_run_activate
 }
 
 function bgterm_run_terminal {
@@ -97,10 +99,9 @@ done
 
 # Command
 case "$1" in
-  s | start)     bgterm_run_terminal   $2 ;;
-  a | activate)  bgterm_run_activate   $2 ;;
-  l | lock)      bgterm_run_lock       $2 ;;
-  u | unlock)    bgterm_run_unlock     $2 ;;
+  s | start)     bgterm_run_terminal    ;;
+  l | lock)      bgterm_run_lock        ;;
+  u | unlock)    bgterm_run_unlock      ;;
   '')            bgterm_run_terminal    ;;
   *)             not_bgterm_command  $1 ;;
 esac
