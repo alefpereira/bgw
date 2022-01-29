@@ -97,10 +97,10 @@ done
 
 # Command
 case "$1" in
-  start)     bgterm_run_terminator $2 ;;
-  activate)  bgterm_run_activate   $2 ;;
-  lock)      bgterm_run_lock       $2 ;;
-  unlock)    bgterm_run_unlock     $2 ;;
+  s | start)     bgterm_run_terminator $2 ;;
+  a | activate)  bgterm_run_activate   $2 ;;
+  l | lock)      bgterm_run_lock       $2 ;;
+  u | unlock)    bgterm_run_unlock     $2 ;;
   '')        bgterm_run_terminator    ;;
   *)         not_bgterm_command    $1 ;;
 esac
