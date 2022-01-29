@@ -60,7 +60,7 @@ function bgterm_run_unlock {
   bgw unlock $BGTERM_TITLE
 }
 
-function bgterm_run_terminator {
+function bgterm_run_terminal {
   FOUND_BGTERM=$(wmctrl -l | grep $BGTERM_TITLE | cut -d' ' -f4)
   if [ -z "$FOUND_BGTERM" ]; then
     $BGTERM_COMMAND
@@ -97,10 +97,10 @@ done
 
 # Command
 case "$1" in
-  s | start)     bgterm_run_terminator $2 ;;
+  s | start)     bgterm_run_terminal   $2 ;;
   a | activate)  bgterm_run_activate   $2 ;;
   l | lock)      bgterm_run_lock       $2 ;;
   u | unlock)    bgterm_run_unlock     $2 ;;
-  '')        bgterm_run_terminator    ;;
-  *)         not_bgterm_command    $1 ;;
+  *)             not_bgterm_command    $1 ;;
+  '')            bgterm_run_terminal      ;;
 esac
