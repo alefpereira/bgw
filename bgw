@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BGW_VERSION='0.1-beta'
+BGW_VERSION='v0.1'
 
 function bgw_version {
   echo "bgw $BGW_VERSION"
