@@ -101,6 +101,6 @@ case "$1" in
   a | activate)  bgterm_run_activate   $2 ;;
   l | lock)      bgterm_run_lock       $2 ;;
   u | unlock)    bgterm_run_unlock     $2 ;;
-  *)             not_bgterm_command    $1 ;;
-  '')            bgterm_run_terminal      ;;
+  '')            bgterm_run_terminal    ;;
+  *)             not_bgterm_command  $1 ;;
 esac
