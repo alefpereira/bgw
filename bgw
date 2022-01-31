@@ -57,84 +57,85 @@ EOF
 
 function bgw_set_window_type_normal {
   # Force window type to "normal" to allow changes in "maximize" properties
-  xprop -name $1 -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_NORMAL
+  xprop -name "$1" -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_NORMAL
 }
 
 function bgw_set_window_type_desktop {
   # Set window type to "desktop" to remove it from the tasklist and display it
   # in background
-  xprop -name $1 -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_DESKTOP
+  xprop -name "$1" -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_DESKTOP
 }
 
 function bgw_add_sticky {
   # Show window in all workspace
-  wmctrl -r $1 -b add,sticky
+  wmctrl -r "$1" -b add,sticky
 }
 
 function bgw_remove_sticky {
   # Remove from all workspace
-  wmctrl -r $1 -b remove,sticky
+  wmctrl -r "$1" -b remove,sticky
 }
 
 function bgw_maximize {
   # Maximize
-  wmctrl -b add,maximized_vert,maximized_horz -r $1
+  wmctrl -b add,maximized_vert,maximized_horz -r "$1"
 }
 
 function bgw_unmaximize {
   # Unmaximize
-  wmctrl -b remove,maximized_vert,maximized_horz -r $1
+  wmctrl -b remove,maximized_vert,maximized_horz -r "$1"
 }
 
 function bgw_add_decoration {
   # Add window decoration
-  xprop -name $1 -f _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS "0x2, 0x0, 0x1, 0x0, 0x0"
+  xprop -name "$1" -f _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS "0x2, 0x0, 0x1, 0x0, 0x0"
 }
 
 function bgw_remove_decoration {
   # Remove window decoration
-  xprop -name $1 -f _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS "0x2, 0x0, 0x0, 0x0, 0x0"
+  xprop -name "$1" -f _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS "0x2, 0x0, 0x0, 0x0, 0x0"
 }
 
 function bgw_resize_to_fill_screen {
   # Setting window to normal type is required to fix size of already locked
   # window. NOTE that this script does NOT change back to original type.
-  bgw_set_window_type_normal $1
+  bgw_set_window_type_normal "$1"
   # Remove decoration to get full maximized GEOMETRY
-  bgw_remove_decoration $1
+  bgw_remove_decoration "$1"
+  sleep 0.1
   # Maximize to get window maximized GEOMETRY
-  bgw_maximize $1
+  bgw_maximize "$1"
   # Give time to window to get maximized
   sleep 0.1
   # Get window maximized GEOMETRY
-  GEOMETRY_LINE=$(wmctrl -l -G | grep $1 | tr -s ' ')
+  GEOMETRY_LINE=$(wmctrl -l -G | grep "$1" | tr -s ' ')
   X_POS=$(echo $GEOMETRY_LINE | cut -d ' ' -f 3)
   Y_POS=$(echo $GEOMETRY_LINE | cut -d ' ' -f 4)
   WIDTH=$(echo $GEOMETRY_LINE | cut -d ' ' -f 5)
   HEIGHT=$(echo $GEOMETRY_LINE | cut -d ' ' -f 6)
   # Remove maximization. Needed to be able to resize.
-  bgw_unmaximize $1
+  bgw_unmaximize "$1"
   # Resize window to maximized geometry
-  wmctrl -e 0,$X_POS,$Y_POS,$WIDTH,$HEIGHT -r $1
+  wmctrl -e 0,$X_POS,$Y_POS,$WIDTH,$HEIGHT -r "$1"
   # Maximize
-  bgw_maximize $1
+  bgw_maximize "$1"
 }
 
 function bgw_unlock {
-  bgw_resize_to_fill_screen $1 # Change window type to "normal"
-  bgw_remove_sticky $1
-  bgw_add_decoration $1
+  bgw_resize_to_fill_screen "$1" # Change window type to "normal"
+  bgw_remove_sticky "$1"
+  bgw_add_decoration "$1"
 }
 
 function bgw_lock {
-  bgw_resize_to_fill_screen $1
-  bgw_add_sticky $1
+  bgw_resize_to_fill_screen "$1"
+  bgw_add_sticky "$1"
   # Window type "desktop" pin window to background
-  bgw_set_window_type_desktop $1
+  bgw_set_window_type_desktop "$1"
 }
 
 function bgw_activate {
-  wmctrl -a $1
+  wmctrl -a "$1"
 }
 
 function bgw_show_desktop {
