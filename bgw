@@ -108,22 +108,28 @@ function bgw_resize_to_fill_screen {
   bgw_set_window_type_normal "$1"
   # Maximize to get window maximized GEOMETRY
   bgw_maximize "$1"
+  bgw_debug "max" 0
   # Get window maximized GEOMETRY
   GEOMETRY_LINE=$(wmctrl -l -G | grep "$1" | tr -s ' ')
   X_POS=$(echo $GEOMETRY_LINE | cut -d ' ' -f 3)
   Y_POS=$(echo $GEOMETRY_LINE | cut -d ' ' -f 4)
   WIDTH=$(echo $GEOMETRY_LINE | cut -d ' ' -f 5)
   HEIGHT=$(echo $GEOMETRY_LINE | cut -d ' ' -f 6)
+  bgw_debug "geometry x: $X_POS y: $Y_POS w: $WIDTH h: $HEIGHT" 2
   # Remove maximization. Needed to be able to resize.
   bgw_unmaximize "$1"
   # Give time to window to get unmaximized
   sleep 0.05
+  bgw_debug "unmax" 2
   # Remove decoration to get full maximized GEOMETRY
   bgw_remove_decoration "$1"
+  bgw_debug "remove decor" 2
   # Resize window to maximized geometry
   wmctrl -e 0,$X_POS,$Y_POS,$WIDTH,$HEIGHT -r "$1"
+  bgw_debug "resize decor" 2
   # Maximize
   bgw_maximize "$1"
+  bgw_debug "max" 2
 }
 
 function bgw_unlock {
