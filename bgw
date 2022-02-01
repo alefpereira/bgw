@@ -106,13 +106,8 @@ function bgw_resize_to_fill_screen {
   # Setting window to normal type is required to fix size of already locked
   # window. NOTE that this script does NOT change back to original type.
   bgw_set_window_type_normal "$1"
-  # Remove decoration to get full maximized GEOMETRY
-  bgw_remove_decoration "$1"
-  sleep 0.1
   # Maximize to get window maximized GEOMETRY
   bgw_maximize "$1"
-  # Give time to window to get maximized
-  sleep 0.1
   # Get window maximized GEOMETRY
   GEOMETRY_LINE=$(wmctrl -l -G | grep "$1" | tr -s ' ')
   X_POS=$(echo $GEOMETRY_LINE | cut -d ' ' -f 3)
@@ -121,6 +116,10 @@ function bgw_resize_to_fill_screen {
   HEIGHT=$(echo $GEOMETRY_LINE | cut -d ' ' -f 6)
   # Remove maximization. Needed to be able to resize.
   bgw_unmaximize "$1"
+  # Give time to window to get unmaximized
+  sleep 0.05
+  # Remove decoration to get full maximized GEOMETRY
+  bgw_remove_decoration "$1"
   # Resize window to maximized geometry
   wmctrl -e 0,$X_POS,$Y_POS,$WIDTH,$HEIGHT -r "$1"
   # Maximize
