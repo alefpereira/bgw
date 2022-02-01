@@ -55,6 +55,12 @@ EOF
   exit 1
 }
 
+function bgw_debug {
+  if [ -n "$BGW_DEBUG" ]; then
+    echo "$1" && sleep $2
+  fi
+}
+
 function bgw_set_window_type_normal {
   # Force window type to "normal" to allow changes in "maximize" properties
   xprop -name "$1" -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_NORMAL
