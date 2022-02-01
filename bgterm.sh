@@ -54,7 +54,7 @@ function bgterm_run_activate {
 
 function bgterm_run_lock {
   bgw lock $BGTERM_TITLE
-  bgterm_run_activate && bgw show-desktop
+  bgw show-desktop && bgterm_run_activate
 }
 
 function bgterm_run_unlock {
